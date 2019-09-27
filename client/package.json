@@ -10,6 +10,12 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
+  "dependencies": {
+    "@babel/runtime": "^7.6.2",
+    "@vkontakte/vkui": "^2.30.7",
+    "react-redux": "^7.1.1",
+    "redux": "^4.0.4"
+  },
   "devDependencies": {
     "cross-env": "^5.2.1",
     "react-hot-loader": "^4.12.13",

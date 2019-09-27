@@ -11,7 +11,10 @@ import '@vkontakte/vkui/dist/vkui.css';
 //import { Group, List, Cell, Gallery, Header, Link, Div } from '@vkontakte/vkui';
 //import { FormLayout, FormLayoutGroup, Input, RangeSlider, Checkbox, Button }from '@vkontakte/vkui';
 import { Epic, Tabbar, TabbarItem } from '@vkontakte/vkui';
-import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
+import Icon24Newsfeed from '@vkontakte/icons/dist/24/newsfeed';
+import Icon24Globe from '@vkontakte/icons/dist/24/globe';
+import Icon24LikeOutline from '@vkontakte/icons/dist/24/like_outline';
+import Icon24UserOutline from '@vkontakte/icons/dist/24/user_outline';
 
 // import TravelPreview from './components/TravelPreview';
 import { Link } from '@vkontakte/vkui';
@@ -61,14 +64,22 @@ class App extends React.Component {
 	            onClick={this.onStoryChange}
 	            selected={this.props.activeStory === 'popular'}
 	            data-story="popular"
-	            text="Популярные"
-	          ><Icon28Newsfeed /></TabbarItem>
+	          ><Icon24Newsfeed /></TabbarItem>
 						<TabbarItem
 	            onClick={this.onStoryChange}
 	            selected={this.props.activeStory === 'myTravel'}
 	            data-story="myTravel"
-	            text="Моё путешествие"
-	          ><Icon28Newsfeed /></TabbarItem>
+	          ><Icon24Globe /></TabbarItem>
+						<TabbarItem
+	            onClick={this.onStoryChange}
+	            selected={this.props.activeStory === 'myTravels'}
+	            data-story="myTravels"
+	          ><Icon24LikeOutline /></TabbarItem>
+						<TabbarItem
+	            onClick={this.onStoryChange}
+	            selected={this.props.activeStory === 'Profile'}
+	            data-story="Profile"
+	          ><Icon24UserOutline /></TabbarItem>
 					</Tabbar>
 				}>
 				<View id="popular" activePanel={'popular__home'}>
@@ -105,6 +116,26 @@ class App extends React.Component {
 							Моё путешествие
 						</PanelHeader>
 						У вас пока ни одного путешествия
+					</Panel>
+			  </View>
+				<View id="myTravels" activePanel={'myTravels__home'}>
+			    <Panel id="myTravels__home">
+						<PanelHeader left={<HeaderButton>
+																<Icon24Back onClick={()=>{ this.go('popular', 'popular__home') }}/>
+															</HeaderButton>}>
+							Мои путешествия
+						</PanelHeader>
+						Тут будет лист путешествий
+					</Panel>
+			  </View>
+				<View id="Profile" activePanel={'Profile__home'}>
+			    <Panel id="Profile__home">
+						<PanelHeader left={<HeaderButton>
+																<Icon24Back onClick={()=>{ this.go('popular', 'popular__home') }}/>
+															</HeaderButton>}>
+							Мой профиль
+						</PanelHeader>
+						Тут будет профиль
 					</Panel>
 			  </View>
 			</Epic>

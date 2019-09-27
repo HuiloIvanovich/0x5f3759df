@@ -16,7 +16,4 @@
     "url": "https://github.com/ARQtty/0x5f3759df/issues"
   },
   "homepage": "https://github.com/ARQtty/0x5f3759df#readme",
-  "dependencies": {
-    "@vkontakte/vkui": "^2.30.7"
-  }
 }
