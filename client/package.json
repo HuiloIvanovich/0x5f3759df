@@ -12,8 +12,12 @@
   "license": "MIT",
   "dependencies": {
     "@babel/runtime": "^7.6.2",
+    "@vkontakte/icons": "^1.10.0",
+    "@vkontakte/vk-connect": "^1.6.5",
     "@vkontakte/vkui": "^2.30.7",
+    "@vkontakte/vkui-connect": "^1.5.4",
     "react": "^16.9.0",
+    "react-dom": "^16.9.0",
     "react-redux": "^7.1.1",
     "react-scripts": "^2.1.8",
     "redux": "^4.0.4"
