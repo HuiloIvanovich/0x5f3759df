@@ -1,0 +1,29 @@
+{
+  "name": "0x5f3759df",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ARQtty/0x5f3759df.git"
+  },
+  "author": "0x5f3759df",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ARQtty/0x5f3759df/issues"
+  },
+  "homepage": "https://github.com/ARQtty/0x5f3759df#readme",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "body-parser": "^1.19.0",
+    "config": "^3.2.2",
+    "express": "^4.17.1",
+    "http-build-query": "^0.7.0",
+    "nodemon": "^1.19.2",
+    "querystring": "^0.2.0"
+  }
+}
