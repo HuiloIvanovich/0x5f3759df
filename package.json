@@ -1,0 +1,19 @@
+{
+  "name": "0x5f3759df",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ARQtty/0x5f3759df.git"
+  },
+  "author": "0x5f3759df",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ARQtty/0x5f3759df/issues"
+  },
+  "homepage": "https://github.com/ARQtty/0x5f3759df#readme"
+}
