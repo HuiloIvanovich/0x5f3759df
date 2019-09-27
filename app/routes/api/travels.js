@@ -44,7 +44,8 @@ router.get('/my', auth, async (req, res) => {
 // @route   GET api/travels/my
 // @desc    Get user's travels
 // @access  Private
-router.get('/my', auth, async (req, res) => {
+router.get('/my', async (req, res) => {
+    console.log(req.headers);
     try {
         const travels = await Travel.find({"users.id": req.user.id});
         res.json(travels);
