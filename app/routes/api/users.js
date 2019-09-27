@@ -18,14 +18,14 @@ router.get('/personal', auth, async (req, res) => {
 // @desc    Auth user
 // @access  Public
 router.get('/auth', async (req, res) => {
-    if(!req.body.user_id || !req.body.params) {
+    if(!req.query.user_id || !req.query.params) {
         return res.status(400).json({err: "Invalid arguments"});
     }
     if(!vkValidate(req.params)) {
         res.status(401).json({err: "Authorization failed"});
     }
     try {
-        const user = await User.findOne({id: req.body.user_id});
+        const user = await User.findOne({id: req.query.user_id});
 
         if (!user) {
             return res.status(400).json({err: "User doesn't exist"});
