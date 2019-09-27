@@ -1,18 +1,24 @@
 import React from 'react';
+import { connect as reduxConnect } from "react-redux";
+import { changeStoryAction } from './redux/actions';
+
 import connect from '@vkontakte/vk-connect';
 import { Root, View, Panel } from '@vkontakte/vkui';
-
 import { PanelHeader, HeaderButton } from '@vkontakte/vkui';
 import Icon24Back from '@vkontakte/icons/dist/24/back';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
-
-import { Group, List, Cell, Gallery, Header, Link, Div } from '@vkontakte/vkui';
-import { FormLayout, FormLayoutGroup, Input, RangeSlider, Checkbox, Button }from '@vkontakte/vkui';
-
-import TravelPreview from './components/TravelPreview';
-import PopularView from './views/popular.jsx';
-
 import '@vkontakte/vkui/dist/vkui.css';
+//import { Group, List, Cell, Gallery, Header, Link, Div } from '@vkontakte/vkui';
+//import { FormLayout, FormLayoutGroup, Input, RangeSlider, Checkbox, Button }from '@vkontakte/vkui';
+import { Epic, Tabbar, TabbarItem } from '@vkontakte/vkui';
+import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
+
+// import TravelPreview from './components/TravelPreview';
+import { Link } from '@vkontakte/vkui';
+// import PopularView from './views/Popular.jsx';
+// import MyTravel from './views/MyTravel.jsx';
+
+
 
 
 class App extends React.Component {
@@ -20,10 +26,6 @@ class App extends React.Component {
 		super(props);
 
 		this.state = {
-			popular: {
-				activeView: 'popular',
-				activePanel: 'popular__home'
-			},
 			fetchedUser: null
 		};
 	}
@@ -42,19 +44,83 @@ class App extends React.Component {
 	}
 
 	go = (viewName, panelName) => {
-		let prev = this.state[viewName];
-		this.setState({ [viewName]: { ...prev, activePanel: panelName }});//this.state.[[viewName]] : panelName} });
+		//let prev = this.state[viewName];
+		//this.setState({ [viewName]: { ...prev, activePanel: panelName }});//this.state.[[viewName]] : panelName} });
 	};
 
+	onStoryChange = (e) => {
+		console.log("click story " + e.currentTarget.dataset.story);
+		this.props.dispatch(changeStoryAction({newStoryName: e.currentTarget.dataset.story }));
+	}
+
 	render() {
-		// <View activePanel={this.state.activePanel}>
-		// 	<Home id="home" fetchedUser={this.state.fetchedUser} go={this.go} />
-		// 	<Persik id="persik" go={this.go} />
-		// </View>
 		return (
-			<PopularView />
+			<Epic activeStory={this.props.activeStory} tabbar={
+	        <Tabbar>
+	          <TabbarItem
+	            onClick={this.onStoryChange}
+	            selected={this.props.activeStory === 'popular'}
+	            data-story="popular"
+	            text="Популярные"
+	          ><Icon28Newsfeed /></TabbarItem>
+						<TabbarItem
+	            onClick={this.onStoryChange}
+	            selected={this.props.activeStory === 'myTravel'}
+	            data-story="myTravel"
+	            text="Моё путешествие"
+	          ><Icon28Newsfeed /></TabbarItem>
+					</Tabbar>
+				}>
+				<View id="popular" activePanel={'popular__home'}>
+			    <Panel id="popular__home">
+						<PanelHeader left={<HeaderButton><Icon24Cancel/></HeaderButton>}>Популярные путешествия</PanelHeader>
+						<Link onClick={ () => { this.go('popular', 'popular__dayly'); }} >
+							Go to travel of the day
+						</Link>
+						<br/>
+						<Link onClick={ () => { this.go('popular', 'popular__list'); }}>
+							Go to popular travels list
+						</Link>
+					</Panel>
+					<Panel id="popular__dayly">
+						<PanelHeader left={<HeaderButton>
+																<Icon24Back onClick={()=>{ this.go('popular', 'popular__home') }}/>
+															</HeaderButton>}>
+							Путешествие дня
+						</PanelHeader>
+					</Panel>
+					<Panel id="popular__list">
+						<PanelHeader left={<HeaderButton>
+																<Icon24Back onClick={()=>{ this.go('popular', 'popular__home') }}/>
+															</HeaderButton>}>
+							Популярные (список)
+						</PanelHeader>
+					</Panel>
+			  </View>
+				<View id="myTravel" activePanel={'myTravel__home'}>
+			    <Panel id="myTravel__home">
+						<PanelHeader left={<HeaderButton>
+																<Icon24Back onClick={()=>{ this.go('popular', 'popular__home') }}/>
+															</HeaderButton>}>
+							Моё путешествие
+						</PanelHeader>
+						У вас пока ни одного путешествия
+					</Panel>
+			  </View>
+			</Epic>
 		);
 	}
 }
 
-export default App;
+
+const mapStateToProps = function(state) {
+	console.log('st', state.activeStoryReducer);
+  let epicState = state.activeStoryReducer.activeStory;
+  return {
+    activeStory: epicState
+  }
+}
+
+export default reduxConnect(
+  mapStateToProps
+)(App);
