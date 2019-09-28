@@ -1,4 +1,5 @@
 import React from 'react';
+// var moment = require('moment');
 import { connect as reduxConnect } from "react-redux";
 import { changeStoryAction } from './redux/actions';
 
@@ -37,28 +38,17 @@ class App extends React.Component {
 			fetchedUser: null,
 			myTravel: {activePanel: 'myTravel__home'},
 			choosenMyTravel: {},
-			myTravels: [
-			 	{ userID: "userID",
-				  data: {
-				    name: 'str',
-				    cost: 'num',
-				    dateFrom: 'dd-mm-yyyy',
-				    dateTo: 'dd-mm-yyyy',
-				    visa: 'str',
-				    country: 'str',
-				    city: 'str',
-				    backgroundImg: 'https://pbs.twimg.com/media/D168StiW0AAi0d6.jpg'
-				 	}
-				}
-			],
+			myTravels: [],
+			search: {text: '',
+							 autocomplete: []
+			},
 			createTravelFields: {
+				users: { user: 123},
 				name: '',
 				costMin: 10,
 				costMax: 200,
 				dateFrom: '',
 				dateTo: '',
-				autocomplete: [],
-				search: '',
 				shengen: false
 			},
 			createTravel: {
@@ -89,10 +79,9 @@ class App extends React.Component {
 		connect.send('VKWebAppGetUserInfo', {});
 
 		//api('get', 'http://autocomplete.travelpayouts.com/places2?term=Сан&locale=ru&types[]=country', {}, {}, (r=> console.log(r)));
-
 		api('get', BASE_URL+'api/users/auth',
 				{ headers: {'Content-Type': 'application/json'},
-					params:  { 'user_id': '123', 'params': '456' }},
+					params:  {'user_id': '123', 'params': '456' }},
 				{},
 				(res => {
 					const token = res.data.token;
@@ -100,23 +89,27 @@ class App extends React.Component {
 						// Got jwt token
 						let config = { headers: { 'x-auth-token': this.state.jwtToken } };
 						// Get my travels
-						api('get', BASE_URL+`api/travels/my`, config, {}, (res) => {
+						api('get', BASE_URL+`api/travels/my`, {}, config, (res) => {
 								let arr = [];
 								for (let tr in res.data){
 									arr.push(res.data[tr]);
-									console.log('tr', res.data[tr]);
 								}
-				        // const travels = res.data;
 				        this.setState({ myTravels: arr });
 						});
-						api('get', BASE_URL+`api/travels/popular`, {}, {}, (res) => {
-							console.log("got popular travels: ", res.data);
-							this.setState({popularTravels: res.data});
+						api('get', BASE_URL+`api/travels/popular`, {}, config, (res) => {
+							if (Object.keys(res.data).length)
+								this.setState({popularTravels: res.data});
 						});
-						api('get', BASE_URL+`api/travels/daily`, {}, {}, (res) => {
-							console.log("got daily travel: ", res.data);
-							this.setState({dailyTravel: res.data});
+						api('get', BASE_URL+`api/travels/daily`, {}, config, (res) => {
+							if (Object.keys(res.data).length)
+								this.setState({dailyTravel: res.data});
 						});
+
+						setTimeout(()=>{
+							console.log("My:", this.state.myTravels);
+							console.log("Popular:", this.state.popularTravels);
+							console.log("Daily:", this.state.dailyTravel);
+						}, 1000);
 					})
 				})
 			);
@@ -126,9 +119,9 @@ class App extends React.Component {
 		country: (e) => {
 			let val = e.target.value;
 			console.log("in", val);
-			this.setState({createTravelFields: {
-											...this.state.createTravelFields,
-											search: val
+			this.setState({search: {
+											...this.state.search,
+											text: val
 											}
 			});
 			this.autocompleteCounty(val);
@@ -282,8 +275,8 @@ class App extends React.Component {
 						</PanelHeader>
 						<CreateTravelCell clickHandler={()=>{this.go('myTravel', 'myTravel__create')}}/>
 						{this.state.myTravels.map((travel) => {
-								if (this.dateActual(travel.data.dateFrom, travel.data.dateTo)){
-									return <TravelCell data={travel.data} clickHandler={()=>{
+								if (this.dateActual(travel.dateFrom, travel.dateTo)){
+									return <TravelCell data={travel} clickHandler={()=>{
 										console.log("clcl");
 										this.go('myTravel', 'myTravel__choosen');
 										this.setState({choosenMyTravel: travel});
@@ -342,19 +335,27 @@ class App extends React.Component {
 								</Div>
 							</FormLayoutGroup>
 							<FormLayoutGroup top="Даты">
-								date1
-								<Input value={this.state.createTravelFields.dateFrom}
-											 onChange={e => { this.handleChange.field('dateFrom', e) }}/>
-								date2
-								<Input value={this.state.createTravelFields.dateto}
-											 onChange={e => { this.handleChange.field('dateTo', e) }}/>
+								<Div style={{display: 'inline-flex'}}>
+									<Div style={{display: 'inline-block'}}>
+										<span>date1</span>
+										<Input value={this.state.createTravelFields.dateFrom}
+													 onChange={e => { this.handleChange.field('dateFrom', e) }}/>
+									</Div>
+									<Div>
+										date2
+										<Input value={this.state.createTravelFields.dateto}
+													 onChange={e => { this.handleChange.field('dateTo', e) }}/>
+									</Div>
+								</Div>
+
+
 							</FormLayoutGroup>
 							<FormLayoutGroup top="Место">
 								Знаю, куда
 								<Div>
-									<Input value={this.state.createTravelFields.search}
+									<Input value={this.state.search.text}
 												 onChange={this.handleChange.country} />
-					          { this.state.createTravelFields.autocomplete.length &&
+					          { this.state.search.autocomplete.length &&
 											<List>
 												{
 													this.state.createTravelFields.autocomplete.map(suggest => {
@@ -382,7 +383,7 @@ class App extends React.Component {
 						Тут будет лист путешествий
 						{ this.state.myTravels.length &&
 							this.state.myTravels.map((travel) => {
-								return <TravelCell data={travel.data} clickHandler={()=>{
+								return <TravelCell data={travel} clickHandler={()=>{
 									console.log("clcl");
 								}}/>
 							})
