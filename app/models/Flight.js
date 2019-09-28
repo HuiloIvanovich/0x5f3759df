@@ -2,7 +2,11 @@ const mongoose = require('mongoose');
 
 const FlightSchema = new mongoose.Schema({
     dateTo: {
-        type: Date(),
+        type: Date,
+        isRequired: true
+    },
+    dateFrom: {
+        type: Date,
         isRequired: true
     },
     cityFrom: {

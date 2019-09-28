@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 
 const HotelSchema = new mongoose.Schema({
     dateTo: {
-        type: Date(),
+        type: Date,
         isRequired: true
     },
     dateFrom: {
-        type: Date(),
+        type: Date,
         isRequired: true
     },
     price: {

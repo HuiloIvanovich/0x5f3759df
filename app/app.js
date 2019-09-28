@@ -7,6 +7,7 @@ const cors = require('cors');
 
 const users = require('./routes/api/users');
 const travels = require('./routes/api/travels');
+const advisors = require('./routes/api/advisors');
 
 const app = express();
 
@@ -18,6 +19,7 @@ db();
 
 app.use('/api/users', users);
 app.use('/api/travels', travels);
+app.use('/api/advisors', advisors);
 
 // if (process.env.NODE_ENV === 'production') {
 //     //Set static folder

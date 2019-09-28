@@ -23,9 +23,8 @@ const ChecklistSchema = new mongoose.Schema({
             isRequired: false
         },
         users: [{
-            user: mongoose.Schema.Types.ObjectId,
-            ref: 'user',
-            isRequired: false
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'user'
         }]
     }]
 });

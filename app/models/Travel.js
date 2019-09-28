@@ -71,11 +71,7 @@ const TravelSchema = new mongoose.Schema({
             isRequired: true
         }
     },
-    flightTo: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'flight'
-    },
-    flightFrom: {
+    flight: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'flight'
     },
