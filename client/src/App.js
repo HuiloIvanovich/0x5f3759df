@@ -104,7 +104,7 @@ class App extends React.Component {
 						});
 						api('get', BASE_URL+`api/travels/daily`, {}, config, (res) => {
 							if (Object.keys(res.data).length)
-								this.setState({dailyTravel: res.data});
+								this.setState({dailyTravel: res.data[0]});
 						});
 
 						setTimeout(()=>{
