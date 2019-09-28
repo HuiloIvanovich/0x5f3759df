@@ -3,7 +3,7 @@ import { connect as reduxConnect } from "react-redux";
 import { changeStoryAction } from './redux/actions';
 
 import connect from '@vkontakte/vk-connect';
-import { Root, View, Panel } from '@vkontakte/vkui';
+import { View, Panel } from '@vkontakte/vkui';
 import { PanelHeader, HeaderButton } from '@vkontakte/vkui';
 import Icon24Back from '@vkontakte/icons/dist/24/back';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
@@ -13,9 +13,9 @@ import { Epic, Tabbar, TabbarItem } from '@vkontakte/vkui';
 import Icon24Newsfeed from '@vkontakte/icons/dist/24/newsfeed';
 import Icon24Globe from '@vkontakte/icons/dist/24/globe';
 import Icon24LikeOutline from '@vkontakte/icons/dist/24/like_outline';
-import Icon24UserOutline from '@vkontakte/icons/dist/24/user_outline';
+import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
 
-import { Link, Div, List, Button } from '@vkontakte/vkui';
+import { Div, List, Button, Group } from '@vkontakte/vkui';
 import { FormLayout, FormLayoutGroup, Input, Checkbox, RangeSlider } from '@vkontakte/vkui';
 
 import TravelCell from './common/TravelCell.jsx';
@@ -23,7 +23,8 @@ import CreateTravelCell from './common/CreateTravelCell.jsx';
 import HelperIcon from './common/HeaderIcon.jsx';
 
 import api from './api.js';
-const BASE_URL = 'https://vk-hackathon.herokuapp.com/';
+const BASE_URL = 'http://95.213.39.142:5000/';
+//'https://vk-hackathon.herokuapp.com/';
 
 
 class App extends React.Component {
@@ -69,7 +70,9 @@ class App extends React.Component {
 				visa: false,
 				country: null,
 				city: null
-			}
+			},
+			popularTravels: [],
+			dailyTravel: null
 		};
 	}
 
@@ -96,15 +99,24 @@ class App extends React.Component {
 	        this.setState({ jwtToken: token }, () => {
 						// Got jwt token
 						let config = { headers: { 'x-auth-token': this.state.jwtToken } };
-						api('get', BASE_URL+`api/travels/`, config, {}, (res) => {
+						// Get my travels
+						api('get', BASE_URL+`api/travels/my`, config, {}, (res) => {
 								let arr = [];
 								for (let tr in res.data){
 									arr.push(res.data[tr]);
 									console.log('tr', res.data[tr]);
 								}
-				        const travels = res.data;
+				        // const travels = res.data;
 				        this.setState({ myTravels: arr });
-							})
+						});
+						api('get', BASE_URL+`api/travels/popular`, {}, {}, (res) => {
+							console.log("got popular travels: ", res.data);
+							this.setState({popularTravels: res.data});
+						});
+						api('get', BASE_URL+`api/travels/daily`, {}, {}, (res) => {
+							console.log("got daily travel: ", res.data);
+							this.setState({dailyTravel: res.data});
+						});
 					})
 				})
 			);
@@ -135,22 +147,33 @@ class App extends React.Component {
 		// TODO validation
 		let send_obj = {};
 		for (let key in this.state.createTravelFields){
-			if (this.state.createTravelFields[key] == null ||
-				 	this.state.createTravelFields[key].length == 0){
-					if (key == 'autocomplete')
+			let val = this.state.createTravelFields[key];
+			if (val == null ||
+				 	val.length === 0){
+					if (key === 'autocomplete')
 						continue;
 					return;
 			}else{
-				send_obj[key] = this.state.createTravelFields[key];
+				if ('dateTo'.includes(key)){
+					let date = val.split('.');
+					if (date.length !== 3){
+						return;
+					}else{
+						if (1){}
+					}
+				}else{
+					send_obj[key] = this.state.createTravelFields[key];
+				}
 			}
 		}
+		console.log("sending ", send_obj);
 		api('post', 'api/travels/custom',
 				send_obj,
 				{ headers: {'x-auth-token': this.state.jwtToken} },
 				(res) => {
 					console.log('travels: ', res);
 				}
-	)
+		)
 	}
 
 
@@ -208,19 +231,32 @@ class App extends React.Component {
 	            onClick={this.onStoryChange}
 	            selected={this.props.activeStory === 'Profile'}
 	            data-story="Profile"
-	          ><Icon24UserOutline /></TabbarItem>
+	          ><Icon28InfoOutline /></TabbarItem>
 					</Tabbar>
 				}>
 				<View id="popular" activePanel={'popular__home'}>
 			    <Panel id="popular__home">
 						<PanelHeader left={<HeaderButton><Icon24Cancel/></HeaderButton>}>Популярные путешествия</PanelHeader>
-						<Link onClick={ () => { this.go('popular', 'popular__dayly'); }} >
-							Go to travel of the day
-						</Link>
-						<br/>
-						<Link onClick={ () => { this.go('popular', 'popular__list'); }}>
-							Go to popular travels list
-						</Link>
+						<Group title="Создайте своё путешествие">
+							<CreateTravelCell clickHandler={()=>{this.go('myTravel', 'myTravel__create')}}/>
+						</Group>
+						{
+							this.state.dailyTravel &&
+							<Group title="Выберите путешествие дня">
+								<TravelCell data={this.state.dailyTravel} />
+							</Group>
+						}
+						{
+							this.state.popularTravels.length !== 0 &&
+							<Group title="Отправьтесь в одно из популярных путешествий">
+								<List>
+									{this.state.popularTravels.map((travel) => {
+											return <TravelCell data={travel} />
+										})
+									}
+								</List>
+							</Group>
+						}
 					</Panel>
 					<Panel id="popular__dayly">
 						<PanelHeader left={<HeaderButton>
@@ -252,6 +288,8 @@ class App extends React.Component {
 										this.go('myTravel', 'myTravel__choosen');
 										this.setState({choosenMyTravel: travel});
 									}}/>
+								}else{
+									return null;
 								}
 							})
 						}

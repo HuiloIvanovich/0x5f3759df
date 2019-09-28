@@ -1,12 +1,9 @@
 import React from 'react';
-import { Div, Link } from '@vkontakte/vkui';
+import { Div } from '@vkontakte/vkui';
 import Icon24AddOutline from '@vkontakte/icons/dist/24/add_outline';
 
 
 export default class CreateTravelCell extends React.Component{
-  constructor(props){
-    super(props);
-  }
 
   createTravelHandler = (e) => {
     console.log('create pressed');
