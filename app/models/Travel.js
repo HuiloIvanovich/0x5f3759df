@@ -9,7 +9,7 @@ const TravelSchema = new mongoose.Schema({
         privateCheclist: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'checklist',
-            isRequired: true
+            isRequired: false
         },
         isAdmin: {
             type: Boolean,
@@ -73,7 +73,8 @@ const TravelSchema = new mongoose.Schema({
     },
     flight: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'flight'
+        ref: 'flight',
+        isRequired: true
     },
     hotel: {
         type: mongoose.Schema.Types.ObjectId,

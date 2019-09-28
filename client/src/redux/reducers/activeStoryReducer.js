@@ -1,7 +1,7 @@
 import { CHANGE_STORY } from "../actionTypes";
 
 const initialState = {
-  activeStory: 'popular'
+  activeStory: 'myTravels'
 };
 
 export default function(state = initialState, action) {
