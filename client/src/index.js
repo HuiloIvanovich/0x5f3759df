@@ -9,7 +9,8 @@ import { Provider } from 'react-redux';
 import store from './redux/store.js';
 
 // Init VK  Mini App
-connect.send('VKWebAppInit', {});
+// In App 
+//connect.send('VKWebAppInit', {});
 
 // Если вы хотите, чтобы ваше веб-приложение работало в оффлайне и загружалось быстрее,
 // расскомментируйте строку с registerServiceWorker();
