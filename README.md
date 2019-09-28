@@ -6,6 +6,7 @@
 
 Что я возвращаю:
 
+```
 {[{
 "flight" : {
         "origin" : origin,
@@ -31,8 +32,7 @@
         "checkOut" : checkOut, 
         "price" : price, 
         "stars" : stars
+}]
 }
-]
-}
-]
-}
+]}
+``
