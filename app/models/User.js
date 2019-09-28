@@ -5,7 +5,8 @@ const UserSchema = new mongoose.Schema({
         type: String,
         isRequired: true,
         unique: true
-    }
+    },
+    timestamps: {}
 });
 
 module.exports = User = mongoose.model('user', UserSchema);
