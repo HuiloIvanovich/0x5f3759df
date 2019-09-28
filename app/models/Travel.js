@@ -6,68 +6,75 @@ const TravelSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'user'
         },
+        privateCheclist: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'checklist',
+            isRequired: true
+        },
         isAdmin: {
             type: Boolean,
             isRequired: true
         }
     }],
-    data: {
+    publicCheclist: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'checklist',
+        isRequired: false
+    },
+    name: {
+        type: String,
+        isRequired: true
+    },
+    cost: {
+        type: Number,
+        isRequired: false
+    },
+    minCost: {
+        type: Number,
+        isRequired: false
+    },
+    maxCost: {
+        type: Number,
+        isRequired: false
+    },
+    dateFrom: {
+        type: Date,
+        isRequired: true
+    },
+    dateTo: {
+        type: Date,
+        isRequired: true
+    },
+    visas: [{
+        visaType: {
+            type: String,
+            isRequired: false
+        }
+    }],
+    country: {
+        iata: {
+            type: String,
+            isRequired: true
+        },
         name: {
             type: String,
             isRequired: true
-        },
-        cost: {
-            type: Number,
-            isRequired: false
-        },
-        minCost: {
-            type: Number,
-            isRequired: false
-        },
-        maxCost: {
-            type: Number,
-            isRequired: false
-        },
-        dateFrom: {
-            type: Date,
+        }
+    },
+    city: {
+        iata: {
+            type: String,
             isRequired: true
         },
-        dateTo: {
-            type: Date,
-            isRequired: true
-        },
-        visas: [{
-            visaType: {
-                type: String,
-                isRequired: false
-            }
-        }],
-        country: {
-            iata: {
-                type: String,
-                isRequired: true
-            },
-            name: {
-                type: String,
-                isRequired: true
-            }
-        },
-        city: {
-            iata: {
-                type: String,
-                isRequired: true
-            },
-            name: {
-                type: String,
-                isRequired: true
-            }
-        },
-        backgroundImage: {
+        name: {
             type: String,
             isRequired: true
         }
+    },
+    backgroundImage: {
+        type: String,
+        isRequired: true
     }
-
 });
 
 module.exports = Travel = mongoose.model('travel', TravelSchema);

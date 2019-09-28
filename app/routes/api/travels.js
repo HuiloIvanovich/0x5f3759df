@@ -41,7 +41,7 @@ router.get('/test2', async (req, res) => {
 router.get('/', auth, async (req, res) => {
     try {
         const user = await User.findOne({id: req.user.id});
-        const travels = await Travel.find({"users.user": user});
+        const travels = await Travel.find({"users.user": user}).populate('user');
         res.json(travels);
     } catch (err) {
         console.log(err);

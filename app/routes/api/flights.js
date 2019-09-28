@@ -8,12 +8,20 @@ const axios = require('axios');
 const User = require('../../models/User');
 const Travel = require('../../models/Travel');
 
-// @route   GET api/advisors/test
-// @desc    Travels test route
+// @route   GET api/flights/test
+// @params  -
+// @desc    Travels flights route
 // @access  Public
+// @return  Message
 router.get('/test', async (req, res) => {
-    res.json({msg: "Advisors route"});
+    res.json({msg: "Flights route"});
 });
 
-
-
+// @route   GET api/flights/advisory
+// @params  {}
+// @desc    Get flights advise
+// @access  Public
+// @return  Message
+router.get('/advisory', async (req, res) => {
+    res.json({msg: "Flights route"});
+});
