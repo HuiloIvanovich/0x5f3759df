@@ -1,5 +1,6 @@
 const axios = require("axios")
-const { WTOKEN } = require("../../config")
+const config = require("config")
+config.get("opencage")
 //https://rapidapi.com/iddogino/api/global-weather-history
 
 function getWeatherByDate(date, latitude, longitude) {
