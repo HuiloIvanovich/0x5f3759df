@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 
 const TravelSchema = new mongoose.Schema({
     users: [{
-        id: {
-            type: String,
-            isRequired: true
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'user'
         },
         isAdmin: {
             type: Boolean,
@@ -46,17 +46,25 @@ const TravelSchema = new mongoose.Schema({
             iata: {
                 type: String,
                 isRequired: true
+            },
+            name: {
+                type: String,
+                isRequired: true
             }
         },
         city: {
             iata: {
                 type: String,
-                isRequired:true
+                isRequired: true
+            },
+            name: {
+                type: String,
+                isRequired: true
             }
         },
         backgroundImage: {
             type: String,
-            isRequired: false
+            isRequired: true
         }
     }
 
