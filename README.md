@@ -6,9 +6,8 @@
 
 Что я возвращаю:
 
-```
-const flight = (origin, destination, depart, returnn, price, airline, number) => {
-    return {
+{[{
+"flight" : {
         "origin" : origin,
         "destination" : destination,
         "depart" : depart, 
@@ -16,26 +15,24 @@ const flight = (origin, destination, depart, returnn, price, airline, number) =>
         "price" : price,
         "airline" : airline, 
         "number" : number
-    }
-}
-
-const hotel = (id, place, checkIn, checkOut, price, stars) => {
-    return {
+}, 
+"hotels": {
+[{
         "id" : id, 
         "place" : place, 
         "checkIn" : checkIn, 
         "checkOut" : checkOut, 
         "price" : price, 
         "stars" : stars
-    }
+} , {
+        "id" : id, 
+        "place" : place, 
+        "checkIn" : checkIn, 
+        "checkOut" : checkOut, 
+        "price" : price, 
+        "stars" : stars
 }
-
-const bind = (hotels, flight) => {
-    return {
-        "flight" : flight, 
-        "hotels" : hotels
-    }
+]
 }
-```
-
-Вот я возвращаю массив из bind
+]
+}
