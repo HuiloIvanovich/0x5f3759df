@@ -7,8 +7,10 @@ const config = require('config');
 const axios = require('axios');
 const User = require('../../models/User');
 const Travel = require('../../models/Travel');
+const Checklist = require('../../models/Advisors/Checklist');
 const popular = require('../../services/travels/popular');
 const daily = require('../../services/travels/daily');
+const custom = require('../../services/travels/custom');
 
 // @route   GET api/travels/test
 // @params  -
@@ -33,12 +35,12 @@ router.get('/test2', async (req, res) => {
     await travel.save();
 });
 
-// @route   GET api/travels/
+// @route   GET api/travels/my
 // @params  -
 // @desc    Get user's travels
 // @access  Private
 // @return  Array of travel jsons
-router.get('/', auth, async (req, res) => {
+router.get('/my', auth, async (req, res) => {
     try {
         const user = await User.findOne({id: req.user.id});
         const travels = await Travel.find({"users.user": user}).populate('user');
@@ -79,12 +81,12 @@ router.get('/daily', auth, async (req, res) => {
     }
 });
 
-// @route   POST api/travels/
+// @route   POST api/travels/new
 // @params  Travel json
 // @desc    Create new travel
 // @access  Private
 // @return  Travel json
-router.post('/', auth, async (req, res) => {
+router.post('/new', auth, async (req, res) => {
     if(!req.body.travel) {
         return res.status(400).json({err: "Invalid arguments"});
     }
@@ -129,6 +131,24 @@ router.post('/delete', auth, async (req, res) => {
     }
     try {
         await Travel.findByIdAndDelete(req.body._id);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   GET api/travels/generate
+// @params  {budgetMin, budgetMax, dateTo, dateFrom, visas, airlines}
+// @desc    Generate new travel based on query
+// @access  Private
+// @return  Travel json
+router.get('/custom', auth, async (req, res) => {
+    if(!req.query.budgetMin || !req.query.budgetMax || !req.query.dateTo || !req.query.dateFrom || !req.query.visas|| !req.query.airlines) {
+        return res.status(400).json({err: "Invalid arguments"});
+    }
+    try {
+        let data = custom.getCustom(req.query.budgetMin, req.query.budagetMax, req.query.dateTo, req.query.dateFrom, req.query.visas, req.query.airlines);
+
     } catch (err) {
         console.log(err);
         res.status(500).send('Server Error');

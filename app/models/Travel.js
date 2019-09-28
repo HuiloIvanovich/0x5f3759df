@@ -29,11 +29,11 @@ const TravelSchema = new mongoose.Schema({
         type: Number,
         isRequired: false
     },
-    minCost: {
+    minBudget: {
         type: Number,
         isRequired: false
     },
-    maxCost: {
+    maxBudget: {
         type: Number,
         isRequired: false
     },
@@ -70,6 +70,18 @@ const TravelSchema = new mongoose.Schema({
             type: String,
             isRequired: true
         }
+    },
+    flightTo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'flight'
+    },
+    flightFrom: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'flight'
+    },
+    hotel: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'hotel'
     },
     backgroundImage: {
         type: String,
