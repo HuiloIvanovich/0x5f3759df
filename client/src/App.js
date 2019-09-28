@@ -23,9 +23,13 @@ import TravelCell from './common/TravelCell.jsx';
 import CreateTravelCell from './common/CreateTravelCell.jsx';
 import HelperIcon from './common/HeaderIcon.jsx';
 
+import DateRangePicker from 'react-daterange-picker'
+import 'react-daterange-picker/dist/css/react-calendar.css'
+
 import api from './api.js';
-// const BASE_URL = 'http://95.213.39.142:5000/';
-const BASE_URL = '/';
+const BASE_URL = 'http://95.213.39.142:5000/';
+// const BASE_URL = 'http://172.20.40.70:5000/';
+// const BASE_URL = '/';
 
 //'https://vk-hackathon.herokuapp.com/';
 
@@ -46,17 +50,19 @@ class App extends React.Component {
 			},
 			createTravelFields: {
 				users: { user: 123},
-				name: '',
-				costMin: 10,
-				costMax: 200,
-				dateFrom: '',
-				dateTo: '',
+				name: 'Отличный отдых',
+				budgetMin: 10,
+				budgetMax: 200,
+				dateFrom: null,
+				dateTo: null,
+				// country: null,
+				// city: null
 				shengen: false
 			},
 			createTravel: {
 				name: '',
-				minCost: null,
-				maxCost: null,
+				minBudget: null,
+				maxBudget: null,
 				dateFrom: null,
 				dateTo: null,
 				visa: false,
@@ -64,7 +70,8 @@ class App extends React.Component {
 				city: null
 			},
 			popularTravels: [],
-			dailyTravel: null
+			dailyTravel: null,
+			calendar: false
 		};
 	}
 
@@ -135,38 +142,39 @@ class App extends React.Component {
 											[fieldName]: e.target.value
 											}
 			});
+		},
+		fieldVal: (fieldName, val) => {
+			this.setState({createTravelFields: {
+											...this.state.createTravelFields,
+											[fieldName]: val
+											}
+			});
 		}
 	}
 
 	handleSendNewTravel = (e) => {
-		// TODO validation
-		let send_obj = {};
+		console.log("enter");
 		for (let key in this.state.createTravelFields){
 			let val = this.state.createTravelFields[key];
-			if (val == null ||
-				 	val.length === 0){
-					if (key === 'autocomplete')
-						continue;
+			console.log("key ", key, val);
+			if (val == null){
 					return;
-			}else{
-				if ('dateTo'.includes(key)){
-					let date = val.split('.');
-					if (date.length !== 3){
-						return;
-					}else{
-						if (1){}
-					}
-				}else{
-					send_obj[key] = this.state.createTravelFields[key];
-				}
+					console.log('oh no')
 			}
 		}
-		console.log("sending ", send_obj);
-		api('post', 'api/travels/custom',
-				send_obj,
+		let send_obj = Object.assign({}, this.state.createTravelFields);
+		console.log("sending", send_obj);
+		api('get', BASE_URL+'api/travels/custom',
+				{ params: {
+					budgetMin: send_obj.budgetMin,
+					budgetMax: send_obj.budgetMax,
+					dateFrom: send_obj.dateFrom,
+					dateTo: send_obj.dateTo,
+					visas: send_obj.shengen? [ 'shengen' ] : [],
+					airlines: []}},
 				{ headers: {'x-auth-token': this.state.jwtToken} },
 				(res) => {
-					console.log('travels: ', res);
+					console.log('travels response: ', res);
 				}
 		)
 	}
@@ -246,7 +254,7 @@ class App extends React.Component {
 							<Group title="Отправьтесь в одно из популярных путешествий">
 								<List>
 									{this.state.popularTravels.map((travel) => {
-											return <TravelCell data={travel} />
+											return <TravelCell key={travel._id} data={travel} />
 										})
 									}
 								</List>
@@ -324,40 +332,40 @@ class App extends React.Component {
 							<FormLayoutGroup top="Название путешествия">
 								<Input value={this.state.createTravelFields.name} onChange={(e) => this.handleChange.field('name', e)}/>
 							</FormLayoutGroup>
-							<FormLayoutGroup top="Сколько денег не жалко?">
+							<FormLayoutGroup top="На какую сумму ищем?">
 								<Div style={{display: 'inline-flex'}}>
-								 10<RangeSlider
+								 {this.state.createTravelFields.budgetMin}k
+								 <RangeSlider
 								 	style={{width: '65vw'}}
 	                top="Uncontrolled"
 	                min={10}
 	                max={200}
-	                step={10}
-	                defaultValue={[this.state.createTravelFields.costMin, this.state.createTravelFields.costMax]}
-	               />200
+	                step={5}
+									onChange={ pair => { this.handleChange.fieldVal('budgetMin', pair[0]);
+																		   this.handleChange.fieldVal('budgetMax', pair[1]);}}
+	                defaultValue={[this.state.createTravelFields.budgetMin, this.state.createTravelFields.budgetMax]}
+	               />
+								 {this.state.createTravelFields.budgetMax}k
 								</Div>
 							</FormLayoutGroup>
 							<FormLayoutGroup top="Даты">
-								<Div style={{display: 'inline-flex'}}>
-									<Div style={{display: 'inline-block'}}>
-										<span>date1</span>
-										<Input value={this.state.createTravelFields.dateFrom}
-													 onChange={e => { this.handleChange.field('dateFrom', e) }}/>
-									</Div>
-									<Div>
-										date2
-										<Input value={this.state.createTravelFields.dateto}
-													 onChange={e => { this.handleChange.field('dateTo', e) }}/>
-									</Div>
-								</Div>
-
-
+								<DateRangePicker
+				          onSelect={(dates) => {
+										this.setState({calendar:dates});
+										this.setState({createTravelFields: {
+											...this.state.createTravelFields,
+											dateFrom: dates.start._d.toJSON().slice(0, 10),
+											dateTo: dates.end._d.toJSON().slice(0, 10)
+										}});
+								  }}
+				          value={this.state.calendar}
+								/>
 							</FormLayoutGroup>
 							<FormLayoutGroup top="Место">
-								Знаю, куда
 								<Div>
 									<Input value={this.state.search.text}
 												 onChange={this.handleChange.country} />
-					          { this.state.search.autocomplete.length &&
+					          { this.state.search.autocomplete.length !== 0 &&
 											<List>
 												{
 													this.state.createTravelFields.autocomplete.map(suggest => {
@@ -367,7 +375,7 @@ class App extends React.Component {
 											</List>
 									  }
 								</Div>
-								или <br/> <br/>
+								<br/>
 								<Checkbox value={this.state.createTravelFields.shengen}
 													onChange={(e) => this.handleChange.field('shengen', e)}>Есть шенгенская виза</Checkbox>
 							</FormLayoutGroup>
@@ -385,7 +393,7 @@ class App extends React.Component {
 						Тут будет лист путешествий
 						{ this.state.myTravels.length &&
 							this.state.myTravels.map((travel) => {
-								return <TravelCell data={travel} clickHandler={()=>{
+								return <TravelCell key={travel._id} data={travel} clickHandler={()=>{
 									console.log("clcl");
 								}}/>
 							})
@@ -413,7 +421,6 @@ class App extends React.Component {
 
 
 const mapStateToProps = function(state) {
-	console.log('st', state.activeStoryReducer);
   let epicState = state.activeStoryReducer.activeStory;
   return {
     activeStory: epicState
