@@ -15,5 +15,5 @@ router.get('/test', async (req, res) => {
     res.json({msg: "Advisors route"});
 });
 
-
+module.exports = router;
 

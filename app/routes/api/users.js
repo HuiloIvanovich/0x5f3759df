@@ -21,9 +21,6 @@ router.get('/auth', async (req, res) => {
     if(!req.query.user_id || !req.query.params) {
         return res.status(400).json({err: "Invalid arguments"});
     }
-    if(!vkValidate(req.params)) {
-        res.status(401).json({err: "Authorization failed"});
-    }
     try {
         const user = await User.findOne({id: req.query.user_id});
 
@@ -58,9 +55,6 @@ router.get('/auth', async (req, res) => {
 router.post('/register', async (req, res) => {
     if(!req.body.user_id || !req.body.params) {
         return res.status(400).json({err: "Invalid arguments"});
-    }
-    if(!vkValidate(req.params)) {
-        res.status(401).json({err: "Authorization failed"});
     }
     try {
         let user = await User.findOne({id: req.user_id});

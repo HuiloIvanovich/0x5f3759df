@@ -1,6 +1,11 @@
+const Travel = require('../../models/Travel');
 
-const getDaily = () => {
-    return 1;
+const getDaily = async () => {
+    try {
+        return await Travel.find({isDaily: true});
+    } catch(err) {
+        throw (err);
+    }
 };
 
 module.exports = {getDaily};

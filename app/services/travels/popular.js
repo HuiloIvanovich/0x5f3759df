@@ -1,8 +1,12 @@
-
+const Travel = require('../../models/Travel');
 
 const getPopular = async () => {
-    //return something
-    return 1;
+    try {
+        const data = await Travel.find({isPopular: true});
+        return data;
+    } catch(err) {
+        throw (err);
+    }
 };
 
 module.exports = {getPopular};
