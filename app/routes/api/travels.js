@@ -7,7 +7,9 @@ const config = require('config');
 const axios = require('axios');
 const User = require('../../models/User');
 const Travel = require('../../models/Travel');
+const Hotel = require('../../models/Hotel');
 const Checklist = require('../../models/Advisors/Checklist');
+const Flight = require('../../models/Flight');
 const popular = require('../../services/travels/popular');
 const daily = require('../../services/travels/daily');
 const custom = require('../../services/travels/custom');
@@ -43,7 +45,8 @@ router.get('/test2', async (req, res) => {
 router.get('/my', auth, async (req, res) => {
     try {
         const user = await User.findOne({id: req.user.id});
-        const travels = await Travel.find({"users.user": user}).populate('user');
+        const travels = await Travel.find({"users.user": user})
+            .populate('flight').populate('hotel').populate('users.user');
         res.json(travels);
     } catch (err) {
         console.log(err);
@@ -58,7 +61,10 @@ router.get('/my', auth, async (req, res) => {
 // @return  Array of travel jsons
 router.get('/popular', auth, async (req, res) => {
     try {
-        const travels = popular.getPopular();
+        // const travels = await popular.getPopular()
+        //     .populate('flight').populate('hotel').populate('users.user');
+        const travels = await Travel.find({isPopular: true})
+            .populate('flight').populate('hotel').populate('users.user');
         res.json(travels);
     } catch (err) {
         console.log(err);
@@ -73,7 +79,10 @@ router.get('/popular', auth, async (req, res) => {
 // @return  Array of travel jsons
 router.get('/daily', auth, async (req, res) => {
     try {
-        const travels = daily.getDaily();
+        // const travels = await daily.getDaily()
+        //     .populate('flight').populate('hotel').populate('users.user');
+        const travels = await Travel.find({isDaily: true})
+            .populate('flight').populate('hotel').populate('users.user');
         res.json(travels);
     } catch (err) {
         console.log(err);
@@ -92,8 +101,31 @@ router.post('/new', auth, async (req, res) => {
     }
     try {
         let travel = new Travel();
-        travel.data = req.body.travel.data;
-        travel.users = req.body.travel.users;
+        const {name, hotel, flight, cost, minBudget, maxBudget, dateFrom, dateTo, visas, country, city, backgroundImage} = req.body.travel;
+        travel.name = name;
+        travel.cost = cost;
+        travel.minBudget = minBudget;
+        travel.maxBudget = maxBudget;
+        travel.dateFrom = dateFrom;
+        travel.dateTo = dateTo;
+        travel.visas = visas;
+        travel.city = city;
+        travel.country = country;
+        travel.backgroundImage = backgroundImage;
+        const _users = await Promise.all(req.body.travel.users.map(async (element) => {
+            const user = await User.findOne({id: element.user.id});
+            return {user: user, isAdmin: true};
+        }));
+        travel.users = _users;
+        travel.isPopular = false;
+        travel.isDaily = false;
+        const _flight = new Flight(flight);
+        await _flight.save();
+        const _hotel = new Hotel(hotel);
+        await _hotel.save();
+        travel.flight = _flight;
+        travel.hotel = _hotel;
+
         await travel.save();
         res.json(travel);
     } catch (err) {

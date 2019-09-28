@@ -8,14 +8,20 @@ const TravelSchema = new mongoose.Schema({
         },
         privateCheclist: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'checklist',
-            isRequired: false
+            ref: 'checklist'
         },
         isAdmin: {
-            type: Boolean,
-            isRequired: true
+            type: Boolean
         }
     }],
+    isDaily: {
+        type: Boolean,
+        isRequired: true
+    },
+    isPopular: {
+        type: Boolean,
+        isRequired: true
+    },
     publicCheclist: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'checklist',
