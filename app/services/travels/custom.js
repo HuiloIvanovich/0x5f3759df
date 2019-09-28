@@ -54,19 +54,14 @@ const bind = (hotels, flight) => {
     }
 }
 
-const compareDates = (dateOne, dateTwo) => {
-    if (dateTwo.substring(0,4) >= dateOne.substring(0, 4) && dateOne.substring(5,7) >= dateOne.substring(5,7) && dateOne.substring(8,10) >= dateOne.substring(8,10)) return true
-    return false
-}
-
-const checkTimeFrame = (flightDateTo, orderDateTo, flightDateFrom, orderDateFrom,  flightCost, budgetMax) => {
-    if (!compareDates(flightDateTo, orderDateTo)) {
+const checkTimeFrame = (flight, orderDateTo, orderDateFrom, sbudgetMax) => {
+    if (flight.depart < orderDateTo) {
         return false
     }
-    if (!compareDates(orderDateFrom, flightDateFrom)) {
+    if (orderDateFrom < flight.return) {
         return false
     }
-    if (flightCost > budgetMax) {
+    if (flight.price > budgetMax) {
         return false
     }
     return true
@@ -83,7 +78,7 @@ const getFlightsCustom = (origin, budgetMax, returnn, depart, currency, airlines
                 let cur = response.data.data[obj]
                 let currentFlight = flight(origin, cur.destination, cur.departure_at.substring(0, 10), cur.return_at.substring(0, 10), cur.airline, cur.flight_number)
                 
-                if (checkTimeFrame(currentFlight.depart, depart, currentFlight.return, returnn, currentFlight.price, budgetMax )) {
+                if (checkTimeFrame(currentFlight, depart, returnn, budgetMax )) {
                     for (var i = 0; i < airlines.length; i++) {
                         if (airlines[i] == currentFlight.airline) {
                             flights.unshift(currentFlight);
@@ -115,7 +110,7 @@ const getHotelsCustom = (origin, checkIn, checkOut, currency) => {
 async function getCustom (origin = "LED", budgetMin = "0", budgetMax = "100000000", returnn = null, depart = new Date().toJSON().slice(0,10), visas = [], airlines = [], currency = "RUB") {
         getFlightsCustom(origin, budgetMax, returnn, depart, currency, airlines)
         .then(response => {
-            processFlights(response, budgetMin, budgetMin)
+            processFlights(response, budgetMin, budgetMax)
         .catch(err => {})
     })
 }
