@@ -24,7 +24,9 @@ import CreateTravelCell from './common/CreateTravelCell.jsx';
 import HelperIcon from './common/HeaderIcon.jsx';
 
 import api from './api.js';
-const BASE_URL = 'http://95.213.39.142:5000/';
+// const BASE_URL = 'http://95.213.39.142:5000/';
+const BASE_URL = '/';
+
 //'https://vk-hackathon.herokuapp.com/';
 
 

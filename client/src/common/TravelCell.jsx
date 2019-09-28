@@ -1,5 +1,5 @@
 import React from 'react';
-import { Div } from '@vkontakte/vkui';
+import { Div, Counter } from '@vkontakte/vkui';
 
 export default class CreateTravelCell extends React.Component{
 
@@ -36,16 +36,22 @@ export default class CreateTravelCell extends React.Component{
                          margin: 0,
                          color: 'white',
                          filter: 'brightness(1.0)'}};
-    console.log('data:', this.props.data);
-
+    // console.log('data:', this.props.data);
+    // let dataFrom = this.props.data.dataFrom.slice(0, 10).split('-');
+    // let dataTo = this.props.data.dataFrom.slice(0, 10).split('-');
+    // console.warn(dataFrom, dataTo);
+    // dataFrom = dataFrom[2] + '.' + dataFrom[1] + '.' + dateFrom[0].slice(0, 2);
+    // dataTo = dataTo[2] + '.' + dataTo[1] + '.' + dateTo[0].slice(0, 2);
     return(
       <Div style={styles.outer} onClick={this.openTravelHandler}>
         <Div style={styles.shadow}></Div>
-
-        <Div style={styles.text}>{this.props.data.city},{this.props.data.country}</Div>
-        <Div style={styles.text}>{this.props.data.dateFrom}-{this.props.data.dateTo}</Div>
-        <Div style={styles.text}>Cost:{this.props.data.cost}></Div>
-        <Div style={Object.assign({float: 'right'},styles.text)}>friends: ooo</Div>
+        <Div style={styles.text}>Путешествие {this.props.data.name}</Div>
+        <Div style={styles.text}>{this.props.data.flight.cityTo.name}, {this.props.data.flight.countryTo.name}</Div>
+        <Div style={styles.text}>{}</Div>
+        <Div style={styles.text}>{this.props.data.cost}></Div>
+        <Div style={Object.assign({float: 'right'},styles.text)}>
+          friends<Counter>{this.props.data.users.length}</Counter>
+        </Div>
       </Div>
     )
   }
