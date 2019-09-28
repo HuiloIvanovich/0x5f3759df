@@ -10,6 +10,7 @@ export default class CreateTravelCell extends React.Component{
   }
 
   render() {
+    console.log("data:", this.props.data);
     let iata = this.props.data.flight.cityTo.iata;
     let styles = {outer: {width:'90vw',
                            height: '13vh',

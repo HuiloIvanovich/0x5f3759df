@@ -2,7 +2,7 @@ import 'core-js/es6/map';
 import 'core-js/es6/set';
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import connect from '@vkontakte/vk-connect';
+import connect from '@vkontakte/vk-connect';
 import App from './App';
 // import registerServiceWorker from './sw';
 import { Provider } from 'react-redux';
@@ -10,7 +10,7 @@ import store from './redux/store.js';
 
 // Init VK  Mini App
 // In App
-//connect.send('VKWebAppInit', {});
+connect.send('VKWebAppInit', {});
 
 // Если вы хотите, чтобы ваше веб-приложение работало в оффлайне и загружалось быстрее,
 // расскомментируйте строку с registerServiceWorker();
