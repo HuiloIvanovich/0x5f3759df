@@ -100,6 +100,7 @@ router.post('/new', auth, async (req, res) => {
         return res.status(400).json({err: "Invalid arguments"});
     }
     try {
+        console.log(req.body.travel);
         let travel = new Travel();
         const {name, hotel, flight, cost, minBudget, maxBudget, dateFrom, dateTo, visas, country, city, backgroundImage} = req.body.travel;
         travel.name = name;
