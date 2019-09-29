@@ -18,7 +18,7 @@ import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
 
 import { Div, List, Button, Group } from '@vkontakte/vkui';
 import { FormLayout, FormLayoutGroup, Input, Checkbox, RangeSlider } from '@vkontakte/vkui';
-import { Gallery } from '@vkontakte/vkui';
+import { Gallery, Footer } from '@vkontakte/vkui';
 
 import TravelCell from './common/TravelCell.jsx';
 import CreateTravelCell from './common/CreateTravelCell.jsx';
@@ -552,6 +552,10 @@ class App extends React.Component {
 									console.log("clcl");
 								}}/>
 							})
+						}
+						{
+							this.state.myTravels.length !== 0 &&
+							<Footer>{this.state.myTravels.length} путешествия</Footer>
 						}
 						{
 							!this.state.myTravels.length &&
