@@ -25,6 +25,8 @@ import CreateTravelCell from './common/CreateTravelCell.jsx';
 import HelperIcon from './common/HeaderIcon.jsx';
 import FlightPreview from './common/FlightPreview.jsx';
 import HotelPreview from './common/HotelPreview.jsx';
+import citiesMap from './assets/citiesMap.json';
+import countriesMap from './assets/countriesMap.json';
 
 import DateRangePicker from 'react-daterange-picker'
 import 'react-daterange-picker/dist/css/react-calendar.css'
@@ -78,7 +80,9 @@ class App extends React.Component {
 
 			suggestedTrips: [],
 			activeSuggestedTripIndex: null,
-			currentShowHotelIndex: null
+			currentShowHotelIndex: null,
+
+			citiesMap: null
 		};
 	}
 
@@ -94,6 +98,8 @@ class App extends React.Component {
 		});
 		connect.send('VKWebAppGetUserInfo', {});
 
+		console.log("citiesMap:", citiesMap);
+		console.log("countriesMap:", countriesMap);
 		api('get', 'http://autocomplete.travelpayouts.com/places2?term=Сан&locale=ru&types[]=country', {}, {}, (r => {
 			console.log('suggest', r);
 		}));
@@ -131,6 +137,26 @@ class App extends React.Component {
 					})
 				})
 			);
+	}
+
+	iata2name = (iata) => {
+		for (let i in citiesMap){
+			if (citiesMap[i].code == iata)
+				return citiesMap[i].name;
+		}
+		return '';
+	}
+	iata2county = (iata)=>{
+		for (let i in citiesMap){
+			if (citiesMap[i].code == iata){
+				let country_code = citiesMap[i].country_code;
+				for (let j in countriesMap){
+					if (countriesMap[j].code == country_code)
+						return countriesMap[j].name;
+				}
+			}
+		}
+		return '';
 	}
 
 	handleChange = {
@@ -191,6 +217,68 @@ class App extends React.Component {
 											   currentShowHotelIndex: 0})
 				}
 		)
+	}
+
+	handleCreateCustomTravel = (e) => {
+		let currFlight = this.state.suggestedTrips[this.state.activeSuggestedTripIndex].flight;
+		let hotelID = this.state.currentShowHotelIndex;
+		let currHotel = this.state.suggestedTrips[this.state.activeSuggestedTripIndex].hotels[hotelID];
+		let cost = currFlight.price + parseInt(currHotel.priceAvg);
+
+		// Prepare flights data
+		let flight = {};
+		flight.dateFrom = currFlight.departure_at;
+		flight.dateTo = currFlight.return_at;
+		flight.cityFrom = {iata: currFlight.origin,
+											 name: this.iata2name(currFlight.origin)};
+	  flight.cityTo = {iata: currFlight.destination,
+										 name: this.iata2name(currFlight.destination)};
+		flight.countryTo = {iata: currFlight.destination,
+												name: this.iata2county(currFlight.destination)};
+		flight.class = '1st';
+		flight.price = currFlight.price;
+		flight.airline = currFlight.airline;
+
+		// Prepare hotel data
+		let hotel = {};
+		hotel.dataFrom= currFlight.departure_at;
+		hotel.dataTo= currFlight.return_at;
+		hotel.price = currHotel.priceAvg;
+		hotel.stars = currHotel.stars;
+		hotel.city = flight.cityTo;
+		hotel.country = flight.countryTo;
+
+		let finalJSON = {
+		 users: [{
+			 user: {
+				 id: this.state.fetchedUser? this.state.fetchedUser.id : 123,
+				 isAdmin: true
+			 }
+		 }],
+		 name: this.state.createTravelFields.name,
+		 cost: cost,
+		 minBudget: this.state.createTravelFields.budgetMin,
+		 maxBudget: this.state.createTravelFields.budgetMax,
+		 dateFrom: this.state.createTravelFields.dateFrom,
+		 dateTo: this.state.createTravelFields.dateTo,
+		 visas: [{visatype: "shengen"}],
+		 countryFrom: {
+			 iata: "RUS",
+			 name: "Russia"
+		 },
+		 flight: flight,
+		 hotel: hotel,
+		 backgroundImage: "emptyUseless"
+		}
+		console.log("send create custom with data", finalJSON);
+		api('post', BASE_URL+'api/travels/new',
+				{travel: finalJSON},
+				{ headers: {'x-auth-token': this.state.jwtToken} },
+				(res) => {
+					console.log("travel/new res is ", res)
+					this.setState({myTravels: this.state.myTravels.concat(res.data)})
+				}
+		);
 	}
 
 
@@ -350,7 +438,7 @@ class App extends React.Component {
 								<Div style={{display: 'inline-flex'}}>
 								 {this.state.createTravelFields.budgetMin}k
 								 <RangeSlider
-								 	style={{width: '65vw'}}
+								 	style={{width: '60vw'}}
 	                top="Uncontrolled"
 	                min={10}
 	                max={200}
@@ -412,17 +500,14 @@ class App extends React.Component {
 								{
 									this.state.suggestedTrips.length !== 0 &&
 									this.state.suggestedTrips.map((trip) => {
-										console.log("at all suggs", this.state.suggestedTrips);
-										console.log("index", this.state.activeSuggestedTripIndex);
-										console.log("start from", this.state.suggestedTrips[this.state.activeSuggestedTripIndex].hotels);
 										return <FlightPreview from={{iata: trip.flight.origin,
 																								 date: trip.flight.departure_at.slice(0, 10),
-																								 country: '?',
-																								 city: '?'}}
+																								 country: this.iata2county(trip.flight.origin),
+																								 city: this.iata2name(trip.flight.origin)}}
 																					to={{iata: trip.flight.destination,
 																							 date: trip.flight.departure_at.slice(0, 10),
-																							 country: '?',
-																							 city: '?'}}
+																							 country: this.iata2county(trip.flight.destination),
+																							 city: this.iata2name(trip.flight.destination)}}
 																					price={trip.flight.price}>
 													</FlightPreview>
 									})
@@ -450,6 +535,7 @@ class App extends React.Component {
 							}
 						</Gallery>
 						</Group>
+						<Button size="xl" onClick={this.handleCreateCustomTravel}>Вперёд!</Button>
 					</Panel>
 			  </View>
 				<View id="myTravels" activePanel={'myTravels__home'}>

@@ -4,11 +4,6 @@ import Plane from './icons/IconPlane.png';
 
 
 export default class FlightPreview extends React.Component{
-  constructor(props){
-    super(props);
-  }
-
-
   render(){
     let styles={outer:{width:'90vw',
                        height: '15vh',

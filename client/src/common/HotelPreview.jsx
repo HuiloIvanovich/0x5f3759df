@@ -4,11 +4,6 @@ import Hotel from './icons/IconHotel.png';
 
 
 export default class HotelPreview extends React.Component{
-  constructor(props){
-    super(props);
-  }
-
-
   render(){
     let styles={outer:{width:'90vw',
                        height: '15vh',
