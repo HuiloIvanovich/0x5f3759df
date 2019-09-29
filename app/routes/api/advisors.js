@@ -17,7 +17,7 @@ router.get('/test', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-    res.json(weather.getWeather(req.query.city));
+    res.json(await weather.getWeather(req.query.city));
 });
 
 module.exports = router;
