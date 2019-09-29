@@ -1,21 +1,15 @@
 const axios = require("axios")
 const config = require("config")
-config.get("opencage")
-//https://rapidapi.com/iddogino/api/global-weather-history
 
-function getWeatherByDate(date, latitude, longitude) {
+function getWeather(city="Moscow") {
     return new Promise((resolve, reject) => {
-        axios.get(`https://iddogino-global-weather-history-v1.p.rapidapi.com/weather&date=${date}&latitude=${latitude}&longitude=${longitude}`, {
-            headers: {
-                "x-rapidapi-host": "iddogino-global-weather-history-v1.p.rapidapi.com",
-                "x-rapidapi-key": "35bbcc1db8mshacb3cbb92f34eeap1dc3ffjsn4c55ea8621e3"
-            }
-        })
-        .then(response => resolve(response))
+        axios.get(`http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=3ede296c7614ce2464cdb5b6b51a3dff`)
+        .then(response => {
+            resolve(response)})
         .catch(err => reject(err))
     })
 }
 
 module.exports = {
-    getWeatherByDate
+    getWeather
 }
