@@ -1,0 +1,7 @@
+{
+  "mongoURI": "mongodb+srv://admin:C7smdM203GnDJ7Xy@cluster0-a068i.mongodb.net/test?retryWrites=true&w=majority",
+  "vkAppSecret": "bl2vIvPPyu9e7x13y09i",
+  "jwtSecret": "someSecret",
+  "aviasales": "321d6a221f8926b5ec41ae89a3b2ae7b",
+  "opencage": "bedcad7e1603478fac5de1f7215b235a"
+}
