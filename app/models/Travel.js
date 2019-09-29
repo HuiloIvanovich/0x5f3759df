@@ -44,11 +44,11 @@ const TravelSchema = new mongoose.Schema({
         isRequired: false
     },
     dateFrom: {
-        type: Date,
+        type: String,
         isRequired: true
     },
     dateTo: {
-        type: Date,
+        type: String,
         isRequired: true
     },
     visas: [{
@@ -85,10 +85,6 @@ const TravelSchema = new mongoose.Schema({
     hotel: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'hotel'
-    },
-    backgroundImage: {
-        type: String,
-        isRequired: true
     }
 });
 

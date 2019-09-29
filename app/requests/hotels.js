@@ -7,7 +7,7 @@ function getHotelByDate(checkIn = null, checkOut = null, location = null, curren
     return new Promise((resolve, reject) => {
         axios.get(`http://engine.hotellook.com/api/v2/cache.json?location=${location}&checkIn=${checkIn}&checkOut=${checkOut}&currency=${currency}&limit=${limit}&token=${key}`)
         .then(response => {
-            (response.length === 0) ? reject("check input") : resolve(response)
+            (response.length === 0) ? reject("check input") : resolve(response.data)
         })
         .catch(err => reject(err))
     })
