@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const weather = require('../../requests/weather');
 const auth = require('../../middleware/auth');
 const vkValidate = require('../../../config/vkSign');
 const jwt = require('jsonwebtoken');
@@ -13,6 +14,10 @@ const Travel = require('../../models/Travel');
 // @access  Public
 router.get('/test', async (req, res) => {
     res.json({msg: "Advisors route"});
+});
+
+router.get('/', async (req, res) => {
+    res.json(await weather.getWeather(req.query.city));
 });
 
 module.exports = router;
