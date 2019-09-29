@@ -2,34 +2,35 @@ import React from 'react';
 // var moment = require('moment');
 import { connect as reduxConnect } from "react-redux";
 import { changeStoryAction } from './redux/actions';
-
 import connect from '@vkontakte/vkui-connect';
-import { View, Panel } from '@vkontakte/vkui';
-import { PanelHeader, HeaderButton } from '@vkontakte/vkui';
-import Icon24Back from '@vkontakte/icons/dist/24/back';
-import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import '@vkontakte/vkui/dist/vkui.css';
 
-import { Epic, Tabbar, TabbarItem } from '@vkontakte/vkui';
+import Icon24Back from '@vkontakte/icons/dist/24/back';
+import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24Newsfeed from '@vkontakte/icons/dist/24/newsfeed';
 import Icon24Globe from '@vkontakte/icons/dist/24/globe';
 import Icon24LikeOutline from '@vkontakte/icons/dist/24/like_outline';
 import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
 
-import { Div, List, Button, Group } from '@vkontakte/vkui';
+import { View, Panel, PanelHeader, HeaderButton, Epic } from '@vkontakte/vkui';
+import { Div, List, Button, Group, Tabbar, TabbarItem } from '@vkontakte/vkui';
 import { FormLayout, FormLayoutGroup, Input, Checkbox, RangeSlider } from '@vkontakte/vkui';
-import { Gallery, Footer } from '@vkontakte/vkui';
+import { Gallery, Footer, FixedLayout, Tabs, TabsItem } from '@vkontakte/vkui';
 
 import TravelCell from './common/TravelCell.jsx';
 import CreateTravelCell from './common/CreateTravelCell.jsx';
-import HelperIcon from './common/HeaderIcon.jsx';
+import HelperIcon from './common/HelperIcon.jsx';
 import FlightPreview from './common/FlightPreview.jsx';
 import HotelPreview from './common/HotelPreview.jsx';
+
 import citiesMap from './assets/citiesMap.json';
 import countriesMap from './assets/countriesMap.json';
 
 import DateRangePicker from 'react-daterange-picker'
 import 'react-daterange-picker/dist/css/react-calendar.css'
+
+import IconWeather from './common/icons/IconWeather.png';
+import IconClothes from './common/icons/IconClothes.png';
 
 import api from './api.js';
 const BASE_URL = 'http://95.213.39.142:5000/';
@@ -47,7 +48,7 @@ class App extends React.Component {
 			actualTravelExists: null,
 			actualTravel: null,
 			fetchedUser: null,
-			myTravel: {activePanel: 'myTravel__create'},
+			myTravel: {activePanel: 'myTravel__home'},
 			choosenMyTravel: {},
 			myTravels: [],
 			search: {text: '',
@@ -82,7 +83,8 @@ class App extends React.Component {
 			activeSuggestedTripIndex: null,
 			currentShowHotelIndex: null,
 
-			citiesMap: null
+			edit: {mode: "public"},
+			helpers: {current: "weater"}
 		};
 	}
 
@@ -281,6 +283,20 @@ class App extends React.Component {
 		);
 	}
 
+	edit = {
+		choose: (mode) => {
+			this.setState({
+				edit: {...this.state.edit, mode:  mode}
+			})
+		}
+	}
+	helpers = {
+		choose: (name) => {
+			this.setState({
+				helpers: {...this.state.helpers, current:  name}
+			})
+		}
+	}
 
 	autocompleteCounty = (countryName) => {
 		// let query = `http://autocomplete.traSearchvelpayouts.com/places2?term=${countryName}&locale=ru&types[]=country`;
@@ -309,7 +325,7 @@ class App extends React.Component {
 	}
 
 	dateActual = (dateFrom, dateTo) => {
-		return false;
+		return true;
 	}
 
 
@@ -389,7 +405,7 @@ class App extends React.Component {
 						{this.state.myTravels.map((travel) => {
 								if (this.dateActual(travel.dateFrom, travel.dateTo)){
 									return <TravelCell data={travel} clickHandler={()=>{
-										console.log("clcl");
+										console.log("clcl", travel);
 										this.go('myTravel', 'myTravel__choosen');
 										this.setState({choosenMyTravel: travel});
 									}}/>
@@ -402,26 +418,39 @@ class App extends React.Component {
 					<Panel id="myTravel__choosen">
 						<PanelHeader left={<HeaderButton>
 																<Icon24Back onClick={()=>{ this.go('myTravel', 'myTravel__home') }}/>
-															</HeaderButton>}/>
-							<Div>podrobno</Div>
-							<Div>Name=>{
-								this.state.choosenMyTravel.data &&
-								this.state.choosenMyTravel.data.name
-								}
-							</Div>
-							<Div style={{display: 'inline-flex'}}>
-								<HelperIcon name="weather" clickHandler={()=>{ this.go('myTravel', 'myTravel__choosen'); this.setState({helperName: 'weather'}); }}/>
-								<HelperIcon name="clothes" clickHandler={()=>{ this.go('myTravel', 'myTravel__choosen'); this.setState({helperName: 'clothes'}); }}/>
-							</Div>
-							<Div style={{display: 'inline-flex'}}>
-								<HelperIcon name="culture" clickHandler={()=>{ this.go('myTravel', 'myTravel__choosen'); this.setState({helperName: 'culture'}); }}/>
-							</Div>
+															</HeaderButton>}>
+							Ваш помощник
+						</PanelHeader>
+						<Div>Путешествие {
+							this.state.choosenMyTravel.name &&
+							this.state.choosenMyTravel.name
+							}
+						</Div>
+						<Div style={{display: 'inline-flex', margin: 0, padding: 0}}>
+							<HelperIcon name="weather" src={IconWeather} clickHandler={()=>{ this.go('myTravel', 'myTravel__helpers') ;this.helpers.choose('weather') }}/>
+							<HelperIcon name="clothes" src={IconClothes} clickHandler={()=>{ this.go('myTravel', 'myTravel__helpers'); this.helpers.choose('clothes') }}/>
+						</Div>
+						<Div style={{display: 'inline-flex', margin: 0, padding: 0}}>
+							<HelperIcon name="culture" clickHandler={()=>{ this.go('myTravel', 'myTravel__helpers'); this.setState({helperName: 'culture'}); }}/>
+						</Div>
+						<FixedLayout vertical="bottom">
+              <Tabs>
+                <TabsItem
+                  onClick={() => this.edit.choose('public')}
+                  selected={this.state.edit.mode === 'public'}
+                >Общее</TabsItem>
+                <TabsItem
+                  onClick={() => this.edit.choose('private')}
+                  selected={this.state.edit.mode === 'private'}
+                >Личное</TabsItem>
+              </Tabs>
+            </FixedLayout>
 					</Panel>
-					<Panel id='myTravel__helper'>
+					<Panel id='myTravel__helpers'>
 						<PanelHeader left={<HeaderButton>
 															 	<Icon24Back onClick={()=>{ this.go('myTravel', 'myTravel__choosen') }}/>
 															 </HeaderButton>}>
-							Помощник {this.state.helperName}
+							Помощник {this.state.helpers.current}
 						</PanelHeader>
 					</Panel>
 					<Panel id="myTravel__create">
@@ -545,7 +574,6 @@ class App extends React.Component {
 															</HeaderButton>}>
 							Мои путешествия
 						</PanelHeader>
-						Тут будет лист путешествий
 						{ this.state.myTravels.length &&
 							this.state.myTravels.map((travel) => {
 								return <TravelCell key={travel._id} data={travel} clickHandler={()=>{
