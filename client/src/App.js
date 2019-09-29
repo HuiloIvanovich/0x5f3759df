@@ -18,10 +18,13 @@ import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
 
 import { Div, List, Button, Group } from '@vkontakte/vkui';
 import { FormLayout, FormLayoutGroup, Input, Checkbox, RangeSlider } from '@vkontakte/vkui';
+import { Gallery } from '@vkontakte/vkui';
 
 import TravelCell from './common/TravelCell.jsx';
 import CreateTravelCell from './common/CreateTravelCell.jsx';
 import HelperIcon from './common/HeaderIcon.jsx';
+import FlightPreview from './common/FlightPreview.jsx';
+import HotelPreview from './common/HotelPreview.jsx';
 
 import DateRangePicker from 'react-daterange-picker'
 import 'react-daterange-picker/dist/css/react-calendar.css'
@@ -42,7 +45,7 @@ class App extends React.Component {
 			actualTravelExists: null,
 			actualTravel: null,
 			fetchedUser: null,
-			myTravel: {activePanel: 'myTravel__home'},
+			myTravel: {activePanel: 'myTravel__create'},
 			choosenMyTravel: {},
 			myTravels: [],
 			search: {text: '',
@@ -71,7 +74,11 @@ class App extends React.Component {
 			},
 			popularTravels: [],
 			dailyTravel: null,
-			calendar: false
+			calendar: false,
+
+			suggestedTrips: [],
+			activeSuggestedTripIndex: null,
+			currentShowHotelIndex: null
 		};
 	}
 
@@ -87,7 +94,9 @@ class App extends React.Component {
 		});
 		connect.send('VKWebAppGetUserInfo', {});
 
-		//api('get', 'http://autocomplete.travelpayouts.com/places2?term=Сан&locale=ru&types[]=country', {}, {}, (r=> console.log(r)));
+		api('get', 'http://autocomplete.travelpayouts.com/places2?term=Сан&locale=ru&types[]=country', {}, {}, (r => {
+			console.log('suggest', r);
+		}));
 		api('get', BASE_URL+'api/users/auth',
 				{ headers: {'Content-Type': 'application/json'},
 					params:  {'user_id': '123', 'params': '456' }},
@@ -170,11 +179,16 @@ class App extends React.Component {
 					budgetMax: send_obj.budgetMax,
 					dateFrom: send_obj.dateFrom,
 					dateTo: send_obj.dateTo,
+					origin: "MOW",
 					visas: send_obj.shengen? [ 'shengen' ] : [],
 					airlines: []}},
 				{ headers: {'x-auth-token': this.state.jwtToken} },
 				(res) => {
 					console.log('travels response: ', res);
+					this.go('myTravel', 'myTravel__create__2');
+					this.setState({suggestedTrips: res.data,
+												 activeSuggestedTripIndex: 0,
+											   currentShowHotelIndex: 0})
 				}
 		)
 	}
@@ -182,9 +196,9 @@ class App extends React.Component {
 
 	autocompleteCounty = (countryName) => {
 		// let query = `http://autocomplete.traSearchvelpayouts.com/places2?term=${countryName}&locale=ru&types[]=country`;
-		// console.warn(query);
-		// axios.get(encodeURI(query),
-		// 					{})
+		// console.warn(query.toJSON());
+		// let config = { headers: { 'x-auth-token': this.state.jwtToken } }
+		// api('get', query, {}, config)
 		// .then(res => {
 		// 	let suggestions = [];
 		// 	for (let i in res.data){
@@ -329,10 +343,10 @@ class App extends React.Component {
 							Новое путешествие
 						</PanelHeader>
 						<FormLayout>
-							<FormLayoutGroup top="Название путешествия">
+							<FormLayoutGroup  top="Название путешествия">
 								<Input value={this.state.createTravelFields.name} onChange={(e) => this.handleChange.field('name', e)}/>
 							</FormLayoutGroup>
-							<FormLayoutGroup top="На какую сумму ищем?">
+							<FormLayoutGroup style={{paddingTop: 0, paddingBottom: 0}} top="На какую сумму ищем?">
 								<Div style={{display: 'inline-flex'}}>
 								 {this.state.createTravelFields.budgetMin}k
 								 <RangeSlider
@@ -348,7 +362,7 @@ class App extends React.Component {
 								 {this.state.createTravelFields.budgetMax}k
 								</Div>
 							</FormLayoutGroup>
-							<FormLayoutGroup top="Даты">
+							<FormLayoutGroup style={{paddingTop: 0, paddingBottom: 0}} top="Даты">
 								<DateRangePicker
 				          onSelect={(dates) => {
 										this.setState({calendar:dates});
@@ -361,7 +375,7 @@ class App extends React.Component {
 				          value={this.state.calendar}
 								/>
 							</FormLayoutGroup>
-							<FormLayoutGroup top="Место">
+							<FormLayoutGroup style={{paddingTop: 0, paddingBottom: 0}} top="Место">
 								<Div>
 									<Input value={this.state.search.text}
 												 onChange={this.handleChange.country} />
@@ -381,6 +395,61 @@ class App extends React.Component {
 							</FormLayoutGroup>
 						</FormLayout>
 						<Button size="xl" onClick={this.handleSendNewTravel}>Собрать</Button>
+					</Panel>
+					<Panel id="myTravel__create__2">
+						<PanelHeader left={<HeaderButton>
+																<Icon24Back onClick={()=>{ this.go('myTravel', 'myTravel__create') }}/>
+															</HeaderButton>}>
+							Подбираем подходящее
+						</PanelHeader>
+						<Group title="Авиабилеты">
+							<Gallery
+								slideWidth="100%"
+								align="center"
+								style={{height: '19vh'}}
+								bullets='dark'
+								onChange={(num) => { console.log('new flight is ', num); this.setState({activeSuggestedTripIndex: num, currentShowHotelIndex: 0}) }}>
+								{
+									this.state.suggestedTrips.length !== 0 &&
+									this.state.suggestedTrips.map((trip) => {
+										console.log("at all suggs", this.state.suggestedTrips);
+										console.log("index", this.state.activeSuggestedTripIndex);
+										console.log("start from", this.state.suggestedTrips[this.state.activeSuggestedTripIndex].hotels);
+										return <FlightPreview from={{iata: trip.flight.origin,
+																								 date: trip.flight.departure_at.slice(0, 10),
+																								 country: '?',
+																								 city: '?'}}
+																					to={{iata: trip.flight.destination,
+																							 date: trip.flight.departure_at.slice(0, 10),
+																							 country: '?',
+																							 city: '?'}}
+																					price={trip.flight.price}>
+													</FlightPreview>
+									})
+								}
+							</Gallery>
+						</Group>
+						<Group title="Доступные по прилёту отели">
+						<Gallery
+							slideWidth="100%"
+							align="center"
+							style={{height: '19vh'}}
+							bullets='dark'
+							slideIndex={this.state.currentShowHotelIndex}
+							onChange={(num)=> { this.setState({currentShowHotelIndex: num})}}>
+							{
+								this.state.activeSuggestedTripIndex !== null &&
+								this.state.suggestedTrips[this.state.activeSuggestedTripIndex].hotels.length !== 0 &&
+								this.state.suggestedTrips[this.state.activeSuggestedTripIndex].hotels.map((hotel) => {
+									return <HotelPreview name={hotel.hotelName}
+																			 country={hotel.location.country}
+																			 city={hotel.location.name}
+																			 price={hotel.priceAvg}
+																			 stars={hotel.stars}></HotelPreview>
+								})
+							}
+						</Gallery>
+						</Group>
 					</Panel>
 			  </View>
 				<View id="myTravels" activePanel={'myTravels__home'}>
