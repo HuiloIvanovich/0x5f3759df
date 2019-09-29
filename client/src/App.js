@@ -328,6 +328,16 @@ class App extends React.Component {
 		return true;
 	}
 
+	getWeather = ()=>{
+		return api('get',
+							 '/api/weater',
+							 {city: 'Moscow'} ,
+							 { headers: { 'x-auth-token': this.state.jwtToken }},
+							 (res) => {return res.data.toString()}
+
+		)
+	}
+
 
 	render() {
 		return (
@@ -451,6 +461,7 @@ class App extends React.Component {
 															 	<Icon24Back onClick={()=>{ this.go('myTravel', 'myTravel__choosen') }}/>
 															 </HeaderButton>}>
 							Помощник {this.state.helpers.current}
+							{this.getWeather()}
 						</PanelHeader>
 					</Panel>
 					<Panel id="myTravel__create">

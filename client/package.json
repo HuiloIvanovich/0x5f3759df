@@ -16,8 +16,6 @@
     "@vkontakte/vk-connect": "^1.6.5",
     "@vkontakte/vkui": "^2.30.7",
     "@vkontakte/vkui-connect": "^1.5.4",
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0",
     "axios": "^0.19.0",
     "babel-eslint": "^9.0.0",
     "core-js": "^2.6.5",
