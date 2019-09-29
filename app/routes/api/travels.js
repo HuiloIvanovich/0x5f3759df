@@ -12,7 +12,7 @@ const Checklist = require('../../models/Advisors/Checklist');
 const Flight = require('../../models/Flight');
 const popular = require('../../services/travels/popular');
 const daily = require('../../services/travels/daily');
-const custom = require('../../services/travels/custom');
+const custom = require('../../services/travels/custom_v2');
 
 // @route   GET api/travels/test
 // @params  -
@@ -175,11 +175,79 @@ router.post('/delete', auth, async (req, res) => {
 // @access  Private
 // @return  Travel json
 router.get('/custom', auth, async (req, res) => {
-    if(!req.query.budgetMin || !req.query.budgetMax || !req.query.dateTo || !req.query.dateFrom || !req.query.visas|| !req.query.airlines) {
+    console.log(req.query);
+    if(!req.query.origin || !req.query.budgetMin || !req.query.budgetMax || !req.query.dateTo || !req.query.dateFrom) {
         return res.status(400).json({err: "Invalid arguments"});
     }
     try {
-        let data = custom.getCustom(req.query.budgetMin, req.query.budagetMax, req.query.dateTo, req.query.dateFrom, req.query.visas, req.query.airlines);
+        let data = await custom.getCustom(req.query.origin, null, req.query.budgetMin, req.query.budgetMax, req.query.dateTo, req.query.dateFrom);
+        res.json(data);
+        //console.log(data);
+    //     res.json([{
+    //             "flight" : {
+    //                 "origin" : "LED",
+    //                 "destination" : "LAX",
+    //                 "depart" : "???",
+    //                 "return" : "???",
+    //                 "price" : 12300,
+    //                 "airline" : "AFL",
+    //                 "number" : "321"
+    //             },
+    //             "hotels":
+    //                 [{
+    //                     "id" : 123123,
+    //                     "place" : "Earth",
+    //                     "checkIn" : Date.now(),
+    //                     "checkOut" : Date.now() + 5000,
+    //                     "price" : 14200,
+    //                     "stars" : 5
+    //                 },
+    //                 {
+    //                     "id" : 123123,
+    //                     "place" : "Earth",
+    //                     "checkIn" : Date.now(),
+    //                     "checkOut" : Date.now() + 5000,
+    //                     "price" : 14200,
+    //                     "stars" : 5
+    //                 },
+    //                 {
+    //                     "id" : 123123,
+    //                     "place" : "Earth",
+    //                     "checkIn" : Date.now(),
+    //                     "checkOut" : Date.now() + 5000,
+    //                     "price" : 14200,
+    //                     "stars" : 5
+    //                 }
+    //             ]},
+    //         {
+    //         "flight" : {
+    //         "origin" : "LED",
+    //             "destination" : "LAX",
+    //             "depart" : "???",
+    //             "return" : "???",
+    //             "price" : 12300,
+    //             "airline" : "AFL",
+    //             "number" : "321"
+    //     },
+    //     "hotels":
+    //     [{
+    //         "id" : 123123,
+    //         "place" : "Earth",
+    //         "checkIn" : Date.now(),
+    //         "checkOut" : Date.now() + 5000,
+    //         "price" : 14200,
+    //         "stars" : 5
+    //     },
+    //     {
+    //         "id" : 123123,
+    //         "place" : "Earth",
+    //         "checkIn" : Date.now(),
+    //         "checkOut" : Date.now() + 5000,
+    //         "price" : 14200,
+    //         "stars" : 5
+    //     }
+    //     ]}
+    // ]);
 
     } catch (err) {
         console.log(err);

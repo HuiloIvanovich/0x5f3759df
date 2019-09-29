@@ -11,28 +11,25 @@ function getFlightByDate(departure_date = null, return_date = null, origin = nul
             }
         })
         .then(response => {
-            (response.error == null) ? resolve(response) : reject(response.error)
+            (response.error == null) ? resolve(response.data) : reject(response.error)
         })
         .catch(err => {
-            console.log(err + " errr")
+            console.log(err + " errr");
             reject(err)
         })
     })
 }
 
-function getPopularFlights(origin = null, currency = "RUB") {
-    return new Promise((resolve, reject) => {
-        axios.get(`https://api.travelpayouts.com/v1/city-directions?origin=${origin}&currency=${currency}&token=${key}`)
-        .then(response => {
-            (response.error == null || response.data > 0) ? resolve(response) : reject(response.error)
-        })
-        .catch(err => {
-            reject(err)
-        })
-    })
+async function getPopularFlights(origin = null, currency = "RUB") {
+        try {
+            const data = await axios.get(`https://api.travelpayouts.com/v1/city-directions?origin=${origin}&currency=${currency}&token=${key}`)
+            return data.data;
+        } catch (err) {
+
+        }
 }
 
 module.exports = {
     getFlightByDate, 
     getPopularFlights
-}
+};

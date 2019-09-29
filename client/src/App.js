@@ -3,7 +3,7 @@ import React from 'react';
 import { connect as reduxConnect } from "react-redux";
 import { changeStoryAction } from './redux/actions';
 
-import connect from '@vkontakte/vk-connect';
+import connect from '@vkontakte/vkui-connect';
 import { View, Panel } from '@vkontakte/vkui';
 import { PanelHeader, HeaderButton } from '@vkontakte/vkui';
 import Icon24Back from '@vkontakte/icons/dist/24/back';
